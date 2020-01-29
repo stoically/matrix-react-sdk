@@ -162,4 +162,14 @@ export default class BasePlatform {
     getEventIndexingManager(): BaseEventIndexManager | null {
         return null;
     }
+
+    /**
+     * Allows the platform to hook the click on the SSO login button to
+     * potentially cancel it, like e.g. the WebExtension Platform needs to
+     * request host permissions before being able to handle an successful SSO
+     * login
+     */
+    ssoLoginButtonHook() {
+        return false;
+    }
 }
