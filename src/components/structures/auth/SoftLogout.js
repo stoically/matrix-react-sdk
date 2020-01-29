@@ -114,7 +114,7 @@ export default class SoftLogout extends React.Component {
             appUrl.query["homeserver"] = client.getHomeserverUrl();
             appUrl.query["identityServer"] = client.getIdentityServerUrl();
 
-            const ssoUrl = client.getSsoLoginUrl(url.format(appUrl), chosenView === LOGIN_VIEW.CAS ? "cas" : "sso");
+            const [ssoUrl] = client.getSsoLoginUrl(url.format(appUrl), chosenView === LOGIN_VIEW.CAS ? "cas" : "sso");
             this.setState({ssoUrl});
         }
     }
