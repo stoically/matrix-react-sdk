@@ -150,9 +150,10 @@ export default class Login {
       // through an SSO login.
       parsedUrl.hash = "";
 
-      parsedUrl.query["homeserver"] = client.getHomeserverUrl();
+      const homeserverUrl = client.getHomeserverUrl();
+      parsedUrl.query["homeserver"] = homeserverUrl;
       parsedUrl.query["identityServer"] = client.getIdentityServerUrl();
-      return client.getSsoLoginUrl(url.format(parsedUrl), loginType);
+      return [client.getSsoLoginUrl(url.format(parsedUrl), loginType), homeserverUrl];
     }
 }
 
