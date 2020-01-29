@@ -162,4 +162,33 @@ export default class BasePlatform {
     getEventIndexingManager(): BaseEventIndexManager | null {
         return null;
     }
+
+    /**
+     * Allows the platform to hook the click on the SSO login button to
+     * potentially cancel it, like e.g. the WebExtension Platform needs to
+     * request host permissions before being able to handle an successful SSO
+     * login
+     */
+    ssoLoginButtonHook() {
+        return false;
+    }
+
+    /**
+     * Allows the platform to hook into the registration if it requires
+     * recaptcha, this is e.g. needed in the WebExtension Platform when running
+     * on Firefox, since they don't allow executing remote code (which is needed
+     * for recaptcha to work)
+     */
+    recaptchaHook() {
+        return false;
+    }
+
+    /**
+     * Some platforms don't need to check browser features because they're in a
+     * controlled environment, so we give the platform the chance to skip the
+     * check by forcing to be a valid browser
+     */
+    forceValidBrowser(): boolean {
+        return false;
+    }
 }
