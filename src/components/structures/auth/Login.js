@@ -27,6 +27,7 @@ import { messageForResourceLimitError } from '../../../utils/ErrorUtils';
 import AutoDiscoveryUtils, {ValidatedServerConfig} from "../../../utils/AutoDiscoveryUtils";
 import classNames from "classnames";
 import AuthPage from "../../views/auth/AuthPage";
+import PlatformPeg from "../../../PlatformPeg";
 
 // For validating phone numbers without country codes
 const PHONE_NUMBER_REGEX = /^[0-9()\-\s]*$/;
@@ -586,8 +587,10 @@ export default createReactClass({
         );
     },
 
-    _renderSsoStep: function(url) {
+    _renderSsoStep: function([url, homeserverUrl]) {
         const SignInToText = sdk.getComponent('views.auth.SignInToText');
+
+        const platformSsoLoginHook = PlatformPeg.get().ssoLoginButtonHook(url, homeserverUrl);
 
         let onEditServerDetailsClick = null;
         // If custom URLs are allowed, wire up the server details edit link.
@@ -602,12 +605,18 @@ export default createReactClass({
         // If this bug gets fixed, it will break SSO since it will open the SSO page in the
         // user's browser, let them log into their SSO provider, then redirect their browser
         // to vector://vector which, of course, will not work.
+        const buttonText = _t('Sign in with single sign-on');
+        const buttonClass = "mx_Login_sso_link mx_Login_submit";
+        const loginButton = !platformSsoLoginHook
+            ? <a href={url} className={buttonClass}>{buttonText}</a>
+            : <a onClick={platformSsoLoginHook} className={buttonClass}>{buttonText}</a>;
+
         return (
             <div>
                 <SignInToText serverConfig={this.props.serverConfig}
                     onEditServerDetailsClick={onEditServerDetailsClick} />
 
-                <a href={url} className="mx_Login_sso_link mx_Login_submit">{ _t('Sign in with single sign-on') }</a>
+                {loginButton}
             </div>
         );
     },
