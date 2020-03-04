@@ -49,6 +49,16 @@ export default abstract class BasePlatform {
         dis.register(this.onAction);
     }
 
+    /**
+     * Allows the platform to hook into the registration if it requires
+     * recaptcha, this is e.g. needed in the WebExtension Platform when running
+     * on Firefox, since they don't allow executing remote code (which is needed
+     * for recaptcha to work)
+     */
+    recaptchaHook(): false | JSX.Element {
+        return false;
+    }
+
     protected onAction = (payload: ActionPayload) => {
         switch (payload.action) {
             case 'on_client_not_viable':
