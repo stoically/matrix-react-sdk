@@ -24,6 +24,7 @@ import classnames from 'classnames';
 import * as sdk from '../../../index';
 import { _t } from '../../../languageHandler';
 import SettingsStore from "../../../settings/SettingsStore";
+import PlatformPeg from "../../../PlatformPeg";
 import AccessibleButton from "../elements/AccessibleButton";
 
 /* This file contains a collection of components which are used by the
@@ -198,6 +199,11 @@ export class RecaptchaAuthEntry extends React.Component {
         if (this.props.busy) {
             const Loader = sdk.getComponent("elements.Spinner");
             return <Loader />;
+        }
+
+        const platformRecaptchaHook = PlatformPeg.get().recaptchaHook();
+        if (platformRecaptchaHook) {
+            return platformRecaptchaHook;
         }
 
         let errorText = this.props.errorText;
