@@ -17,13 +17,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {MatrixClient} from "matrix-js-sdk/src/client";
-import dis from './dispatcher/dispatcher';
-import BaseEventIndexManager from './indexing/BaseEventIndexManager';
-import {ActionPayload} from "./dispatcher/payloads";
-import {CheckUpdatesPayload} from "./dispatcher/payloads/CheckUpdatesPayload";
-import {Action} from "./dispatcher/actions";
-import {hideToast as hideUpdateToast} from "./toasts/UpdateToast";
+import { MatrixClient } from "matrix-js-sdk/src/client";
+import dis from "./dispatcher/dispatcher";
+import BaseEventIndexManager from "./indexing/BaseEventIndexManager";
+import { ActionPayload } from "./dispatcher/payloads";
+import { CheckUpdatesPayload } from "./dispatcher/payloads/CheckUpdatesPayload";
+import { Action } from "./dispatcher/actions";
+import { hideToast as hideUpdateToast } from "./toasts/UpdateToast";
 
 export const SSO_HOMESERVER_URL_KEY = "mx_sso_hs_url";
 export const SSO_ID_SERVER_URL_KEY = "mx_sso_is_url";
@@ -57,10 +57,20 @@ export default abstract class BasePlatform {
 
     abstract getDefaultDeviceDisplayName(): string;
 
+    /**
+     * Allows the platform to hook into the registration if it requires
+     * recaptcha, this is e.g. needed in the WebExtension Platform when running
+     * on Firefox, since they don't allow executing remote code (which is needed
+     * for recaptcha to work)
+     */
+    recaptchaHook(): false | JSX.Element {
+        return false;
+    }
+
     protected onAction = (payload: ActionPayload) => {
         switch (payload.action) {
-            case 'on_client_not_viable':
-            case 'on_logged_out':
+            case "on_client_not_viable":
+            case "on_logged_out":
                 this.setNotificationCount(0);
                 break;
         }
@@ -97,8 +107,7 @@ export default abstract class BasePlatform {
      * Update the currently running app to the latest available version
      * and replace this instance of the app with the new version.
      */
-    installUpdate() {
-    }
+    installUpdate() {}
 
     /**
      * Check if the version update has been deferred and that deferment is still in effect
@@ -106,7 +115,9 @@ export default abstract class BasePlatform {
      */
     protected shouldShowUpdate(newVersion: string): boolean {
         try {
-            const [version, deferUntil] = JSON.parse(localStorage.getItem(UPDATE_DEFER_KEY));
+            const [version, deferUntil] = JSON.parse(
+                localStorage.getItem(UPDATE_DEFER_KEY)
+            );
             return newVersion !== version || Date.now() > deferUntil;
         } catch (e) {
             return true;
@@ -120,7 +131,10 @@ export default abstract class BasePlatform {
     deferUpdate(newVersion: string) {
         const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
         date.setHours(8, 0, 0, 0); // set to next 8am
-        localStorage.setItem(UPDATE_DEFER_KEY, JSON.stringify([newVersion, date.getTime()]));
+        localStorage.setItem(
+            UPDATE_DEFER_KEY,
+            JSON.stringify([newVersion, date.getTime()])
+        );
         hideUpdateToast();
     }
 
@@ -151,10 +165,14 @@ export default abstract class BasePlatform {
      */
     abstract requestNotificationPermission(): Promise<string>;
 
-    abstract displayNotification(title: string, msg: string, avatarUrl: string, room: Object);
+    abstract displayNotification(
+        title: string,
+        msg: string,
+        avatarUrl: string,
+        room: Object
+    );
 
-    loudNotification(ev: Event, room: Object) {
-    }
+    loudNotification(ev: Event, room: Object) {}
 
     clearNotification(notif: Notification) {
         // Some browsers don't support this, e.g Safari on iOS
@@ -245,14 +263,27 @@ export default abstract class BasePlatform {
      * @param {"sso"|"cas"} loginType the type of SSO it is, CAS/SSO.
      * @param {string} fragmentAfterLogin the hash to pass to the app during sso callback.
      */
-    startSingleSignOn(mxClient: MatrixClient, loginType: "sso" | "cas", fragmentAfterLogin: string) {
+    startSingleSignOn(
+        mxClient: MatrixClient,
+        loginType: "sso" | "cas",
+        fragmentAfterLogin: string
+    ) {
         // persist hs url and is url for when the user is returned to the app with the login token
-        localStorage.setItem(SSO_HOMESERVER_URL_KEY, mxClient.getHomeserverUrl());
+        localStorage.setItem(
+            SSO_HOMESERVER_URL_KEY,
+            mxClient.getHomeserverUrl()
+        );
         if (mxClient.getIdentityServerUrl()) {
-            localStorage.setItem(SSO_ID_SERVER_URL_KEY, mxClient.getIdentityServerUrl());
+            localStorage.setItem(
+                SSO_ID_SERVER_URL_KEY,
+                mxClient.getIdentityServerUrl()
+            );
         }
         const callbackUrl = this.getSSOCallbackUrl(fragmentAfterLogin);
-        window.location.href = mxClient.getSsoLoginUrl(callbackUrl.toString(), loginType); // redirect to SSO
+        window.location.href = mxClient.getSsoLoginUrl(
+            callbackUrl.toString(),
+            loginType
+        ); // redirect to SSO
     }
 
     onKeyDown(ev: KeyboardEvent): boolean {
@@ -267,7 +298,10 @@ export default abstract class BasePlatform {
      * @returns {string|null} the previously stored pickle key, or null if no
      *     pickle key has been stored.
      */
-    async getPickleKey(userId: string, deviceId: string): Promise<string | null> {
+    async getPickleKey(
+        userId: string,
+        deviceId: string
+    ): Promise<string | null> {
         return null;
     }
 
@@ -278,7 +312,10 @@ export default abstract class BasePlatform {
      * @returns {string|null} the pickle key, or null if the platform does not
      *     support storing pickle keys.
      */
-    async createPickleKey(userId: string, deviceId: string): Promise<string | null> {
+    async createPickleKey(
+        userId: string,
+        deviceId: string
+    ): Promise<string | null> {
         return null;
     }
 
@@ -287,6 +324,5 @@ export default abstract class BasePlatform {
      * @param {string} userId the user ID for the user that the pickle key is for.
      * @param {string} userId the device ID that the pickle key is for.
      */
-    async destroyPickleKey(userId: string, deviceId: string): Promise<void> {
-    }
+    async destroyPickleKey(userId: string, deviceId: string): Promise<void> {}
 }

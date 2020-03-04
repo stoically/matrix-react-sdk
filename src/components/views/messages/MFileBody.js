@@ -273,7 +273,7 @@ export default class MFileBody extends React.Component {
                 }, "*");
             };
 
-            const url = "usercontent/"; // XXX: this path should probably be passed from the skin
+            const url = "usercontent/index.html"; // XXX: this path should probably be passed from the skin
 
             // If the attachment is encrypted then put the link inside an iframe.
             return (
